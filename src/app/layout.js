@@ -2,7 +2,9 @@ import { AuthProvider } from "../context/AuthContext";
 import Header from "@/components/Header";
 import "./globals.css";
 import Footer from "@/components/Footer";
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/react"
 
 export const metadata = {
   title: "Best Movies and TV shows watching platform | Welcome to AKmovies",
