@@ -1,0 +1,244 @@
+.container{
+  position: relative;
+}
+
+.innercontainer{
+  width: 100%;
+  margin-top: -13rem;
+  z-index: 100;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.topimg {
+  z-index: 50;
+  width: 100%;
+  background-position: center;
+  position: relative;
+}
+
+.backdrop{
+  position: absolute;
+  background-image: linear-gradient(0deg, var(--bgmain), transparent);
+  bottom: 0;
+  width: 100%;
+  height: 50rem;
+}
+
+.topimg img {
+  width: 100%;
+  background-position: top;
+  height: 30rem;
+  object-fit: cover;
+}
+
+
+
+.content{
+  display: flex;
+  gap: 3rem;
+  width: 100%;
+}
+
+.contentimg{
+  width: 35%;
+  border-radius: 1rem;
+}
+
+.contentimg img{
+  box-shadow: 0 0 10px 5px #161616;
+  border-radius: 1rem;
+  width: 100%;
+}
+
+.info{
+  color: white;
+  width: 65%;
+}
+
+.info h1{
+  font-size: 3.5rem;
+}
+.overview{
+  font-size: 1rem;
+  color: var(--para);
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.genres{
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 2rem 0;
+}
+
+.genre{
+  padding: 0.3rem 1.5rem;
+  background-color: var(--litebg);
+  border-radius: 3rem;
+  border: 2px solid white;
+}
+
+.metadata{
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.metadata p{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.metaiconcal{
+  font-size: 1rem;
+}
+.metaiconimdb{
+  font-size: 2rem;
+}
+.metaicontime{
+  font-size: 1.5rem;
+}
+
+.castContainer{
+  margin-top: 2rem;
+}
+.castContainer h2{
+  margin-bottom: 1rem;
+}
+.castList{
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.castMember{
+  width: 6rem;
+}
+.castMember img{
+  width: 100%;
+}
+.castMember p{
+  font-size: 0.8rem;
+  color: var(--para);
+}
+
+.actions{
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.actions button{
+  background-color: white;
+  color: black;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 0.5rem 1.5rem;
+  border-radius: 3rem;
+  border: 1px solid white;
+}
+
+.selectorContainer{
+  display: flex;
+  margin-top: 5rem;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.selector label{
+  font-size: 1rem;
+  font-weight: bold;
+  margin-right: 2rem;
+}
+.selector select{
+  font-size: 0.8rem;
+  font-weight: bold;
+  height: 100%;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  background-color: var(--litebg);
+  color: white;
+}
+
+.selector select:focus{
+  outline: none;
+}
+
+.videoContainer {
+  width: 100%;
+  margin-top: 6rem;
+  margin-bottom: 4rem;
+}
+
+.videoContainer h1{
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+@media(max-width: 1025px) {
+  .contentimg{
+    display: none;
+  }
+  .info{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .info h1{
+    text-align: center;
+  }
+  .genres{
+    justify-content: center;
+  }
+  .overview{
+    text-align: center;
+  }
+  .actions{
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+  }
+  .metadata{
+    margin-top: 2rem;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+  }
+  .castContainer h2{
+    text-align: center;
+  }
+  .castList{
+    align-items: center;
+    justify-content: center;
+  }
+  .selectorContainer{
+    align-items: center;
+    justify-content: center;
+  }
+  .selectorContainer label{
+    display: none;
+  }
+}
+
+@media(max-width: 500px) {
+  .info h1{
+    font-size: 3rem;
+  }
+  .selector select{
+    width: 100%;
+  }
+}

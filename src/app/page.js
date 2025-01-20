@@ -1,95 +1,162 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import React, { useEffect, useState } from "react";
+import tmdbApi, { movieType, tvType } from "../utils/tmdbApi";
+import HorizontalSlider from "@/components/HorizontalSlider";
+import { useAuth } from "@/context/AuthContext"; // Assuming you have an AuthContext
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../utils/firebase"; // Assuming Firebase is initialized here
+import styles from "./index.module.css";
+import Slider from "@/components/Slider";
+
+export default function HomePage() {
+  const [trendingMovies, setTrendingMovies] = useState([]);
+  const [topRatedMovies, setTopRatedMovies] = useState([]);
+  const [trendingTV, setTrendingTV] = useState([]);
+  const [topRatedTV, setTopRatedTV] = useState([]);
+  const [continueWatching, setContinueWatching] = useState([]); // Continue Watching section
+  const [searchResults, setSearchResults] = useState([]);
+  const [query, setQuery] = useState("");
+
+  const { user } = useAuth(); // User info from AuthContext
+
+  // Fetch data for sliders
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [trendingMoviesRes, topRatedMoviesRes, trendingTVRes, topRatedTVRes] =
+          await Promise.all([
+            tmdbApi.getMoviesList(movieType.popular, { page: 1 }),
+            tmdbApi.getMoviesList(movieType.top_rated, { page: 1 }),
+            tmdbApi.getTvList(tvType.popular, { page: 1 }),
+            tmdbApi.getTvList(tvType.top_rated, { page: 1 }),
+          ]);
+
+        setTrendingMovies(trendingMoviesRes.results.slice(0, 15)); // Limit to 15 items
+        setTopRatedMovies(topRatedMoviesRes.results.slice(0, 15)); // Limit to 15 items
+        setTrendingTV(trendingTVRes.results.slice(0, 15)); // Limit to 15 items
+        setTopRatedTV(topRatedTVRes.results.slice(0, 15)); // Limit to 15 items
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Fetch continue watching data from Firebase
+  useEffect(() => {
+    const fetchContinueWatching = async () => {
+      if (!user) return;
+
+      try {
+        const historyCollection = collection(db, "users", user.uid, "history");
+        const snapshot = await getDocs(historyCollection);
+        const historyData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setContinueWatching(historyData);
+      } catch (error) {
+        console.error("Failed to fetch continue watching data:", error);
+      }
+    };
+
+    fetchContinueWatching();
+  }, [user]);
+
+  // Handle search functionality
+  const handleSearch = async (searchQuery) => {
+    if (!searchQuery) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const [movieResults, tvResults] = await Promise.all([
+        tmdbApi.search("movie", { query: searchQuery, page: 1 }),
+        tmdbApi.search("tv", { query: searchQuery, page: 1 }),
+      ]);
+
+      setSearchResults([...movieResults.results, ...tvResults.results]);
+    } catch (error) {
+      console.error("Search failed:", error);
+    }
+  };
+
+  // Update search results when the query changes
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      handleSearch(query);
+    }, 500); // Debounce for 500ms
+
+    return () => clearTimeout(timeout);
+  }, [query]);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+    <div className={styles.container}>
+      <Slider />
+      <div className="maincontainer">
+        {/* Search Bar */}
+        <div className={styles.searchBar}>
+          <input
+            type="text"
+            placeholder="Search for movies or TV shows..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className={styles.searchInput}
+          />
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        {/* Search Results */}
+        {searchResults.length > 0 ? (
+          <HorizontalSlider
+            title="Search Results"
+            items={searchResults}
+            mediaType="mixed" // Can be a mix of movies and TV shows
+            onViewMore={null} // No "View More" for search results
           />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        ) : (
+          <>
+            {/* Continue Watching Section */}
+            {user && continueWatching.length > 0 && (
+              <HorizontalSlider
+                title="Continue Watching"
+                items={continueWatching}
+                mediaType="movie" // Assuming it's a mix of movies and TV shows
+                onViewMore={() => (window.location.href = "/continue-watching")}
+              />
+            )}
+
+            {/* Horizontal Sliders */}
+            <HorizontalSlider
+              title="Trending Movies"
+              items={trendingMovies}
+              mediaType="movie"
+              onViewMore={() => (window.location.href = "result/movie/popular")}
+            />
+            <HorizontalSlider
+              title="Top Rated Movies"
+              items={topRatedMovies}
+              mediaType="movie"
+              onViewMore={() => (window.location.href = "result/movie/top_rated")}
+            />
+            <HorizontalSlider
+              title="Trending TV"
+              items={trendingTV}
+              mediaType="tv"
+              onViewMore={() => (window.location.href = "result/tv/popular")}
+            />
+            <HorizontalSlider
+              title="Top Rated TV"
+              items={topRatedTV}
+              mediaType="tv"
+              onViewMore={() => (window.location.href = "result/tv/top_rated")}
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 }

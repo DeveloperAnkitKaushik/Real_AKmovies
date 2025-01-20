@@ -1,42 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+    --bgmain: #0f1330;
+    --litebg: #222857;
+    --foreground: #171717;
+    --para: rgb(147, 147, 147);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
+    font-family: "DM Sans", sans-serif;
+    width: 100%;
+    height: 100%;
+    scrollbar-width: thin;
+    background-color: var(--bgmain);
+    /* scrollbar-color: transparent transparent; */
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.text-gradient {
+    background: linear-gradient(79deg, #2b0aff, #ff5b8a 49%, #ff5b8a 55%, #fba64b 77%, #f99b52);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.spinner {
+    animation: spin 2s linear infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.maincontainer {
+    width: 100%;
+    max-width: 1536px;
+    margin: 0 auto;
+    padding: 1rem 5%;
+}
+
+@media(max-width: 1536px) {
+    .maincontainer {
+        max-width: 1366px;
+    }
+}
+
+@media(max-width: 1366px) {
+    .maincontainer {
+        max-width: 1280px;
+    }
+}
+
+@media(max-width: 1280px) {
+    .maincontainer {
+        max-width: 1024px;
+    }
+}
+
+@media(max-width: 1024px) {
+    .maincontainer {
+        max-width: 768px;
+    }
+}
+
+@media(max-width: 768px) {
+    .maincontainer {
+        max-width: 638px;
+    }
+}
+
+.none{
+    color: white;
+    text-align: center;
+}
+
+.loadingcontainer{
+    background-color: var(--bgmain);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+}
+
+.loading{
+    width: 6rem;
+}
+
+.loading img,
+.found img{
+    width: 100%;
+}
+
+.found{
+    width: 20rem;
 }
