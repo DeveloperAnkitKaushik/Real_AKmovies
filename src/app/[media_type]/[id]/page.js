@@ -12,6 +12,7 @@ import { MdAvTimer } from "react-icons/md";
 import Loader from "@/skeletons/SimpleLoader";
 import ShowVideoButton from "@/components/ShowVideoButton";
 import toast from 'react-hot-toast';
+import { FaPlayCircle } from "react-icons/fa";
 
 export default function DetailPage() {
   const { media_type, id } = useParams();
@@ -26,6 +27,7 @@ export default function DetailPage() {
   const [showTrailer, setShowTrailer] = useState(false);
   const [videos, setVideos] = useState([]);
   const [cast, setCast] = useState([]);
+  const [showIframePlayer, setShowIframePlayer] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -90,7 +92,6 @@ export default function DetailPage() {
 
     fetchDetails();
   }, [media_type, id, user]);
-
   const fetchEpisodes = async (tvId, seasonNumber, episodeNumber = 1) => {
     try {
       const res = await fetch(
@@ -115,7 +116,7 @@ export default function DetailPage() {
   };
 
   const addToContinueWatching = async () => {
-    if (!user || !details){
+    if (!user || !details) {
       toast.error('Please login First!');
       return;
     }
@@ -133,11 +134,11 @@ export default function DetailPage() {
       episode: selectedEpisode,
       lastWatched: new Date().toISOString(),
     });
-    toast.success(`Added to your continue watching.`)
+    setShowIframePlayer(true);
   };
 
   const addToFavorites = async () => {
-    if (!user || !details){
+    if (!user || !details) {
       toast.error('Please login First!');
       return;
     }
@@ -220,13 +221,7 @@ export default function DetailPage() {
               </div>
 
               <div className={styles.actions}>
-                <ShowVideoButton videos={videos}/>
-                <button
-                  onClick={addToContinueWatching}
-                  className={styles.continueWatchingButton}
-                >
-                  Add to Continue Watching
-                </button>
+                <ShowVideoButton videos={videos} />
                 {isFavorite ? (
                   <button
                     onClick={removeFromFavorites}
@@ -309,18 +304,30 @@ export default function DetailPage() {
           {/* Vidsrc Player */}
           <div className={styles.videoContainer}>
             <h1>Use AdBlockers</h1>
-            <iframe
+            {!showIframePlayer ? (
+              <div
+                className={styles.outerPlayer}
+                style={{
+                  backgroundImage: `url(https://image.tmdb.org/t/p/original/${details.backdrop_path})`,
+                }}
+              >
+                <div className={styles.playeroverlay}>
+                </div>
+                <FaPlayCircle className={styles.playButton} onClick={addToContinueWatching}/>
+              </div>
+            ) : (<iframe
               src={
                 media_type === "tv"
-                  ? `https://vidsrc.icu/embed/tv/${id}/${selectedSeason}/${selectedEpisode}`
-                  : `https://vidsrc.icu/embed/movie/${id}`
+                  ? `https://vidsrc.icu/embed/tv/${id}/${selectedSeason}/${selectedEpisode}?autoPlay=false`
+                  : `https://vidsrc.icu/embed/movie/${id}?autoPlay=false`
               }
               frameBorder="0"
               width="100%"
               height="500px"
               allowFullScreen
               className={styles.videoPlayer}
-            ></iframe>
+              />
+            )}
           </div>
 
           {/* Trailer Popup */}
