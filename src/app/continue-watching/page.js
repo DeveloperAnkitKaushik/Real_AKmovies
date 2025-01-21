@@ -20,24 +20,16 @@ export default function ContinueWatchingPage() {
   const fetchWatching = async () => {
     setDataLoading(true);
     try {
+      if (!user) return;
+
       const historyCollection = collection(db, "users", user.uid, "history");
       const snapshot = await getDocs(historyCollection);
+      const historyData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-      const data = snapshot.docs.map((doc) => {
-        const keyParts = doc.id.split("/");
-        const [type, id, season, episode] = keyParts;
-
-        return {
-          id: doc.id, // Firebase document ID
-          type: type === "0" ? "movie" : "tv",
-          itemId: id,
-          season: season ? parseInt(season) : null,
-          episode: episode ? parseInt(episode) : null,
-          ...doc.data(),
-        };
-      });
-
-      setWatching(data);
+      setWatching(historyData);
     } catch (error) {
       console.error("Error fetching continue watching data:", error);
     } finally {
@@ -79,7 +71,7 @@ export default function ContinueWatchingPage() {
           <div className={styles.grid}>
             {watching.map((item) => (
               <div key={item.id} className={styles.card}>
-                <Link href={`/${item.type}/${item.id}`}>
+                <Link href={`/${item.mediaType}/${item.id}`}>
                   <div
                     className={styles.poster}
                     style={{

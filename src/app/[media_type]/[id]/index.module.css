@@ -275,3 +275,11 @@
   font-size: 3rem;
   color: white;
 }
+
+.changeIcon{
+  font-size: 1rem;
+  color: rgb(192, 192, 192);
+  text-align: center;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}

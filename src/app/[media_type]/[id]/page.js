@@ -13,6 +13,7 @@ import Loader from "@/skeletons/SimpleLoader";
 import ShowVideoButton from "@/components/ShowVideoButton";
 import toast from 'react-hot-toast';
 import { FaPlayCircle } from "react-icons/fa";
+import { FaExchangeAlt } from "react-icons/fa";
 
 export default function DetailPage() {
   const { media_type, id } = useParams();
@@ -28,6 +29,7 @@ export default function DetailPage() {
   const [videos, setVideos] = useState([]);
   const [cast, setCast] = useState([]);
   const [showIframePlayer, setShowIframePlayer] = useState(false);
+  const [secondPlayer, setSecondPlayer] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -304,6 +306,13 @@ export default function DetailPage() {
           {/* Vidsrc Player */}
           <div className={styles.videoContainer}>
             <h1>Use AdBlockers</h1>
+            <div className={styles.changeIcon} onClick={() => {
+              if (!user) {
+                toast.error('Please Login First!');
+                return;
+              }
+              setSecondPlayer(!secondPlayer);
+            }}>Change Server <FaExchangeAlt /></div>
             {!showIframePlayer ? (
               <div
                 className={styles.outerPlayer}
@@ -313,19 +322,21 @@ export default function DetailPage() {
               >
                 <div className={styles.playeroverlay}>
                 </div>
-                <FaPlayCircle className={styles.playButton} onClick={addToContinueWatching}/>
+                <FaPlayCircle className={styles.playButton} onClick={addToContinueWatching} />
               </div>
-            ) : (<iframe
-              src={
-                media_type === "tv"
-                  ? `https://vidsrc.icu/embed/tv/${id}/${selectedSeason}/${selectedEpisode}?autoPlay=false`
-                  : `https://vidsrc.icu/embed/movie/${id}?autoPlay=false`
-              }
-              frameBorder="0"
-              width="100%"
-              height="500px"
-              allowFullScreen
-              className={styles.videoPlayer}
+            ) : (
+              <iframe
+                src={
+                  media_type === "tv"
+                    ? `${secondPlayer ? process.env.NEXT_PUBLIC_SECOND_VIDIOPLAYER_APP : process.env.NEXT_PUBLIC_FIRST_VIDIOPLAYER_APP}/tv/${id}/${selectedSeason}/${selectedEpisode}?autoPlay=false`
+                    : `${secondPlayer ? process.env.NEXT_PUBLIC_SECOND_VIDIOPLAYER_APP : process.env.NEXT_PUBLIC_FIRST_VIDIOPLAYER_APP}/movie/${id}?autoPlay=false`
+                }
+                frameBorder="0"
+                width="100%"
+                height="500px"
+                allowFullScreen
+                sandbox={secondPlayer ? undefined : "allow-scripts allow-same-origin"}
+                className={styles.videoPlayer}
               />
             )}
           </div>
