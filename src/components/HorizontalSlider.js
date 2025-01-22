@@ -2,7 +2,7 @@ import React from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import styles from "./HorizontalSlider.module.css";
 import { FaPlay } from "react-icons/fa";
-import Sus from "@/skeletons/slider";
+import Loader from "@/skeletons/HorizontalLoader";
 
 const HorizontalSlider = ({ title, items, mediaType, onViewMore }) => {
     const [emblaRef] = useEmblaCarousel({ loop: false, dragFree: true });
@@ -24,7 +24,7 @@ const HorizontalSlider = ({ title, items, mediaType, onViewMore }) => {
             <div className={styles.embla} ref={emblaRef}>
                 <div className={styles.emblaContainer}>
                     {items.length === 0 ? (
-                        <Sus /> // Render skeleton if no items are available
+                        <Loader /> // Render skeleton if no items are available
                     ) : (
                         items.map((item) => {
                             const resolvedMediaType = item.media_type || item.mediaType || mediaType; // Handle mixed results

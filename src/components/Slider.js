@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import tmdbApi, { movieType } from "../utils/tmdbApi";
 import apiConfig from "../utils/apiConfig";
 import styles from "./slider.module.css" // Add your styles here
+import Loader from "@/skeletons/SimpleLoader";
 
 const EmblaCarousel = () => {
     const [popular, setPopular] = useState([]); // Store popular TV/movies
@@ -36,7 +37,7 @@ const EmblaCarousel = () => {
         emblaApi.on("select", handleSelect);
     }, [emblaApi, handleSelect]);
 
-    if (!popular.length) return <p>Loading...</p>;
+    if (!popular.length) return <Loader/>;
 
     // Animation Variants
     const textVariants = {
