@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
-  title: "AKMovies - Watch Movies & TV Shows Online for Free",
+  title: "Best site to Watch Movies & TV Shows Online for Free | Akmovies",
   description: "Stream the latest movies and TV shows in HD for free on AKMovies. No sign-up required. Watch online now!",
   keywords: "AKMovies, free movies, watch movies online, HD streaming, TV shows, online movies, streaming site",
   robots: "index, follow",  
