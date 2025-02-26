@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import { FaPlayCircle } from "react-icons/fa";
 import { FaExchangeAlt } from "react-icons/fa";
 
+
 export default function DetailPage() {
   const { media_type, id } = useParams();
   const { user } = useAuth();
@@ -172,11 +173,15 @@ export default function DetailPage() {
     toast.success(`Removed from your favorites.`)
   };
 
+
   if (loading) return <Loader />;
 
+  console.log(details.title);
   return (
     <div className={styles.container}>
       {/* Details Section */}
+
+
       <div className={styles.topimg}>
         <img
           src={`https://image.tmdb.org/t/p/original/${details.backdrop_path}`}
@@ -329,13 +334,13 @@ export default function DetailPage() {
                 src={
                   media_type === "tv"
                     ? `${secondPlayer ? process.env.NEXT_PUBLIC_SECOND_VIDIOPLAYER_APP : process.env.NEXT_PUBLIC_FIRST_VIDIOPLAYER_APP}/tv/${id}/${selectedSeason}/${selectedEpisode}?autoPlay=false`
-                    : `${secondPlayer ? process.env.NEXT_PUBLIC_SECOND_VIDIOPLAYER_APP : process.env.NEXT_PUBLIC_FIRST_VIDIOPLAYER_APP}/movie/${id}?autoPlay=false`
+                    : `${secondPlayer ? process.env.NEXT_PUBLIC_SECOND_VIDIOPLAYER_APP : process.env.NEXT_PUBLIC_FIRST_VIDIOPLAYER_APP}/movie/${id}`
                 }
                 frameBorder="0"
                 width="100%"
                 height="500px"
                 allowFullScreen
-                sandbox={secondPlayer ? undefined : "allow-scripts allow-same-origin"}
+                // sandbox={secondPlayer ? undefined : "allow-scripts allow-same-origin"}
                 className={styles.videoPlayer}
               />
             )}

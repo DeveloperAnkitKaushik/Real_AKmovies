@@ -6,6 +6,7 @@ import HorizontalSlider from "@/components/HorizontalSlider";
 import { useAuth } from "@/context/AuthContext";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../utils/firebase";
+import Head from "next/head"; // Import for SEO meta tags
 import styles from "./index.module.css";
 import Slider from "@/components/Slider";
 
@@ -79,7 +80,6 @@ export default function HomePage() {
                 tmdbApi.search("tv", { query: searchQuery, page: 1 }),
             ]);
 
-            // Add `media_type` to results for correct routing
             const movies = movieResults.results.map((item) => ({
                 ...item,
                 media_type: "movie",
@@ -105,68 +105,85 @@ export default function HomePage() {
     }, [query]);
 
     return (
-        <div className={styles.container}>
-            <Slider />
-            <div className="maincontainer">
-                {/* Search Bar */}
-                <div className={styles.searchBar}>
-                    <input
-                        type="text"
-                        placeholder="Search for movies or TV shows..."
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        className={styles.searchInput}
-                    />
-                </div>
+        <>
+            <Head>
+                <title>AKMovies - Stream Your Favorite Movies and TV Shows</title>
+                <meta name="description" content="AKMovies allows you to stream trending movies and TV shows, track your favorites, and continue watching seamlessly." />
+                <meta name="keywords" content="Movies, TV Shows, Streaming, AKMovies, Entertainment" />
+                <meta name="author" content="Ankit Kaushik" />
+                <meta property="og:title" content="AKMovies - Stream Movies and TV Shows" />
+                <meta property="og:description" content="Stream trending movies and TV shows with AKMovies. Track favorites and continue watching seamlessly." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://realakmovies.vercel.app" />
+                <meta property="og:image" content="https://realakmovies.vercel.app/logo.png" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="AKMovies - Stream Movies and TV Shows" />
+                <meta name="twitter:description" content="Stream trending movies and TV shows with AKMovies. Track favorites and continue watching seamlessly." />
+                <meta name="twitter:image" content="https://realakmovies.vercel.app/logo.png" />
+            </Head>
+            <div className={styles.container}>
+                <Slider />
+                <div className="maincontainer">
+                    {/* Search Bar */}
+                    <div className={styles.searchBar}>
+                        <input
+                            type="text"
+                            placeholder="Search for movies or TV shows..."
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            className={styles.searchInput}
+                        />
+                    </div>
 
-                {/* Search Results */}
-                {searchResults.length > 0 ? (
-                    <HorizontalSlider
-                        title="Search Results"
-                        items={searchResults}
-                        mediaType="mixed"
-                        onViewMore={null} // No "View More" for search results
-                    />
-                ) : (
-                    <>
-                        {/* Continue Watching Section */}
-                        {user && continueWatching.length > 0 && (
+                    {/* Search Results */}
+                    {searchResults.length > 0 ? (
+                        <HorizontalSlider
+                            title="Search Results"
+                            items={searchResults}
+                            mediaType="mixed"
+                            onViewMore={null}
+                        />
+                    ) : (
+                        <>
+                            {/* Continue Watching Section */}
+                            {user && continueWatching.length > 0 && (
+                                <HorizontalSlider
+                                    title="Continue Watching"
+                                    items={continueWatching}
+                                    mediaType="mixed"
+                                    onViewMore={() => (window.location.href = "/continue-watching")}
+                                />
+                            )}
+
+                            {/* Horizontal Sliders */}
                             <HorizontalSlider
-                                title="Continue Watching"
-                                items={continueWatching}
-                                mediaType="mixed"
-                                onViewMore={() => (window.location.href = "/continue-watching")}
+                                title="Trending Movies"
+                                items={trendingMovies}
+                                mediaType="movie"
+                                onViewMore={() => (window.location.href = "/result/movie/popular")}
                             />
-                        )}
-
-                        {/* Horizontal Sliders */}
-                        <HorizontalSlider
-                            title="Trending Movies"
-                            items={trendingMovies}
-                            mediaType="movie"
-                            onViewMore={() => (window.location.href = "/result/movie/popular")}
-                        />
-                        <HorizontalSlider
-                            title="Top Rated Movies"
-                            items={topRatedMovies}
-                            mediaType="movie"
-                            onViewMore={() => (window.location.href = "/result/movie/top_rated")}
-                        />
-                        <HorizontalSlider
-                            title="Trending TV"
-                            items={trendingTV}
-                            mediaType="tv"
-                            onViewMore={() => (window.location.href = "/result/tv/popular")}
-                        />
-                        <HorizontalSlider
-                            title="Top Rated TV"
-                            items={topRatedTV}
-                            mediaType="tv"
-                            onViewMore={() => (window.location.href = "/result/tv/top_rated")}
-                        />
-                    </>
-                )}
+                            <HorizontalSlider
+                                title="Top Rated Movies"
+                                items={topRatedMovies}
+                                mediaType="movie"
+                                onViewMore={() => (window.location.href = "/result/movie/top_rated")}
+                            />
+                            <HorizontalSlider
+                                title="Trending TV"
+                                items={trendingTV}
+                                mediaType="tv"
+                                onViewMore={() => (window.location.href = "/result/tv/popular")}
+                            />
+                            <HorizontalSlider
+                                title="Top Rated TV"
+                                items={topRatedTV}
+                                mediaType="tv"
+                                onViewMore={() => (window.location.href = "/result/tv/top_rated")}
+                            />
+                        </>
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     );
 }

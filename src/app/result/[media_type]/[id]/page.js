@@ -6,6 +6,7 @@ import tmdbApi, { movieType, tvType } from "@/utils/tmdbApi";
 import styles from "./index.module.css";
 import { FaPlay } from "react-icons/fa";
 import Loader from "@/skeletons/SimpleLoader";
+import Head from "next/head";
 
 export default function MediaListPage() {
   const { media_type, id } = useParams();
@@ -69,36 +70,54 @@ export default function MediaListPage() {
   if (loading && page === 1) return <Loader />;
 
   return (
-    <div className={styles.outercontainer}>
-      <div className={styles.bg} style={{ backgroundImage: `url(/bg.jpg)` }} >
-        <h1 className={styles.title}>{id.replace("-", " ").toUpperCase()}</h1>
-        <div className={styles.bgoverlay}></div>
-      </div>
-      <div className={styles.container}>
-        <div className={styles.grid}>
-          {items.map((item, i) => (
-            <a href={`/${media_type}/${item.id}`} key={i} className={styles.card}>
-              <div
-                className={styles.poster}
-                style={{
-                  backgroundImage: `url(https://image.tmdb.org/t/p/w500${item.poster_path})`,
-                }}
-              >
-                <div className={styles.hover}>
-                  <div className={styles.innerhover}><FaPlay /></div>
-                </div>
-              </div>
-            </a>
-          ))}
+    <>
+      <Head>
+        <title>{`${id.replace("-", " ").toUpperCase()} - Watch ${media_type === "movie" ? "Movies" : "TV Shows"} Online`}</title>
+        <meta
+          name="description"
+          content={`Stream ${id.replace("-", " ")} online for free. Discover top-rated ${media_type === "movie" ? "movies" : "TV shows"} and enjoy unlimited streaming.`}
+        />
+        <meta name="keywords" content={`Watch ${id}, ${id} full ${media_type}, ${id} free online`} />
+        <meta property="og:title" content={`${id.replace("-", " ").toUpperCase()} - Watch Online`} />
+        <meta
+          property="og:description"
+          content={`Watch ${id.replace("-", " ")} ${media_type === "movie" ? "movie" : "TV show"} online for free in HD.`}
+        />
+        <meta property="og:image" content="https://image.tmdb.org/t/p/w500/sample-image.jpg" />
+      </Head>
+      <div className={styles.outercontainer}>
+        <div className={styles.bg} style={{ backgroundImage: `url(/bg.jpg)` }}>
+          <h1 className={styles.title}>{id.replace("-", " ").toUpperCase()}</h1>
+          <div className={styles.bgoverlay}></div>
         </div>
-        {loadMoreLoading ? (
-          <p>Loading more...</p>
-        ) : (
-          <button className={styles.loadMoreButton} onClick={handleLoadMore}>
-            Load More
-          </button>
-        )}
+        <div className={styles.container}>
+          <div className={styles.grid}>
+            {items.map((item, i) => (
+              <a href={`/${media_type}/${item.id}`} key={i} className={styles.card}>
+                <div
+                  className={styles.poster}
+                  style={{
+                    backgroundImage: `url(https://image.tmdb.org/t/p/w500${item.poster_path})`,
+                  }}
+                >
+                  <div className={styles.hover}>
+                    <div className={styles.innerhover}>
+                      <FaPlay />
+                    </div>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+          {loadMoreLoading ? (
+            <p>Loading more...</p>
+          ) : (
+            <button className={styles.loadMoreButton} onClick={handleLoadMore}>
+              Load More
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
