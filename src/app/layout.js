@@ -16,7 +16,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <link rel="canonical" href="https://realakmovies.vercel.app/" />
-
+        <meta name="google-site-verification" content="IhleRkwS3CAPHzFgSf0ySPwCj7IYM1DdenB4JQzDb28" />
         <meta property="og:title" content="AKMovies - Free Movies & TV Shows Online" />
         <meta property="og:description" content="Watch the latest movies and TV shows for free on AKMovies. No sign-up needed. HD streaming available." />
         <meta property="og:url" content="https://realakmovies.vercel.app/" />
