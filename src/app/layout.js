@@ -7,7 +7,7 @@ import { Toaster } from 'react-hot-toast';
 export const metadata = {
   title: "Best site to Watch Movies & TV Shows Online for Free | Akmovies",
   description: "Stream the latest movies and TV shows in HD for free on AKMovies. No sign-up required. Watch online now!",
-  keywords: "AKMovies, free movies, watch movies online, HD streaming, TV shows, online movies, streaming site",
+  keywords: "AKMovies, ankit kaushik, ankit, realakmovies, akmovie, free movies, watch movies online, HD streaming, TV shows, online movies, streaming site",
   robots: "index, follow",  
 };
 
@@ -21,21 +21,20 @@ export default function RootLayout({ children }) {
         <meta property="og:description" content="Watch the latest movies and TV shows for free on AKMovies. No sign-up needed. HD streaming available." />
         <meta property="og:url" content="https://realakmovies.vercel.app/" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://realakmovies.vercel.app/logo.png" />
+        <meta property="og:image" content="https://realakmovies.vercel.app/icon.png" />
 
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="AKMovies - Free HD Movies & TV Shows" />
         <meta name="twitter:description" content="Enjoy free HD streaming of movies and TV shows on AKMovies. No sign-up needed!" />
         <meta name="twitter:image" content="https://realakmovies.vercel.app/logo.png" />
 
-        {/* Structured Data (JSON-LD) for Google Search */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "MovieRentalStore",
             "name": "AKMovies",
             "url": "https://realakmovies.vercel.app/",
-            "logo": "https://realakmovies.vercel.app/logo.png",
+            "logo": "https://realakmovies.vercel.app/icon.png",
             "sameAs": [
               "https://twitter.com/akmovies",
               "https://www.facebook.com/akmovies",
