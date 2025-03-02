@@ -10,7 +10,6 @@ import Head from "next/head";
 
 export default function MediaListPage() {
   const { media_type, id } = useParams();
-  console.log(media_type, id);
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,7 +38,6 @@ export default function MediaListPage() {
         return;
       }
 
-      console.log("Fetching category:", category, "Page:", pageNumber);
 
       const response =
         media_type === "movie"

@@ -6,7 +6,6 @@ import Loader from "@/skeletons/HorizontalLoader";
 
 const HorizontalSlider = ({ title, items, mediaType, onViewMore }) => {
     const [emblaRef] = useEmblaCarousel({ loop: false, dragFree: true });
-    console.log(items);
     
     return (
         <div className={styles.container}>

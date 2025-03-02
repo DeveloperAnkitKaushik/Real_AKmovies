@@ -1,6 +1,6 @@
 export async function generateMetadata({ params }) {
   if (!params) return {};
-  const { media_type, id } = params;
+  const { media_type, id } = await params;
 
   // Fetch Movie/TV Show Data
   const res = await fetch(

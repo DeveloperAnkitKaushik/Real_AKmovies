@@ -176,7 +176,6 @@ export default function DetailPage() {
 
   if (loading) return <Loader />;
 
-  console.log(details.title);
   return (
     <div className={styles.container}>
       {/* Details Section */}
