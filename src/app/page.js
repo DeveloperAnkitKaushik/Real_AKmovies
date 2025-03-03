@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import tmdbApi, { movieType, tvType } from "../utils/tmdbApi";
 import HorizontalSlider from "@/components/HorizontalSlider";
 import { useAuth } from "@/context/AuthContext";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query as firestoreQuery, orderBy } from "firebase/firestore";
 import { db } from "../utils/firebase";
 import Head from "next/head"; // Import for SEO meta tags
 import styles from "./index.module.css";
@@ -45,13 +45,16 @@ export default function HomePage() {
         fetchData();
     }, []);
 
-    // Fetch continue watching data from Firebase
     useEffect(() => {
         const fetchContinueWatching = async () => {
             if (!user) return;
 
             try {
-                const historyCollection = collection(db, "users", user.uid, "history");
+                const historyCollection = firestoreQuery(
+                    collection(db, "users", user.uid, "history"),
+                    orderBy("lastWatched", "desc") // Sorting by lastWatched in descending order
+                );
+
                 const snapshot = await getDocs(historyCollection);
                 const historyData = snapshot.docs.map((doc) => ({
                     id: doc.id,
@@ -66,6 +69,8 @@ export default function HomePage() {
 
         fetchContinueWatching();
     }, [user]);
+
+
 
     // Handle search functionality
     const handleSearch = async (searchQuery) => {

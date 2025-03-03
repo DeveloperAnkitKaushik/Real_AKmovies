@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, query, orderBy } from "firebase/firestore";
 import { db } from "../../utils/firebase";
 import Link from "next/link";
 import { FaPlay } from "react-icons/fa";
@@ -22,7 +22,10 @@ export default function ContinueWatchingPage() {
     try {
       if (!user) return;
 
-      const historyCollection = collection(db, "users", user.uid, "history");
+      const historyCollection = query(
+        collection(db, "users", user.uid, "history"),
+        orderBy("lastWatched", "desc")
+      );
       const snapshot = await getDocs(historyCollection);
       const historyData = snapshot.docs.map((doc) => ({
         id: doc.id,
