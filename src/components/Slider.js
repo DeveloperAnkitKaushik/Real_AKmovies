@@ -37,7 +37,7 @@ const EmblaCarousel = () => {
         emblaApi.on("select", handleSelect);
     }, [emblaApi, handleSelect]);
 
-    if (!popular.length) return <Loader/>;
+    if (!popular.length) return <Loader />;
 
     // Animation Variants
     const textVariants = {
@@ -59,7 +59,9 @@ const EmblaCarousel = () => {
                             <div
                                 className={styles.bg}
                                 style={{
-                                    backgroundImage: `url(https://image.tmdb.org/t/p/original/${item.backdrop_path})`,
+                                    backgroundImage: `url(${item.backdrop_path
+                                        ? `https://image.tmdb.org/t/p/original/${item.backdrop_path}`
+                                        : "/LargePosterAlt.jpg"})`,
                                 }}
                             >
                                 <div className={styles.bgoverlay}></div>

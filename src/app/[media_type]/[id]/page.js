@@ -183,7 +183,11 @@ export default function DetailPage() {
 
       <div className={styles.topimg}>
         <img
-          src={`https://image.tmdb.org/t/p/original/${details.backdrop_path}`}
+          src={
+            details.backdrop_path
+              ? `https://image.tmdb.org/t/p/original/${details.backdrop_path}`
+              : "/LargePosterAlt.jpg"
+          }
           alt="Large Poster"
           className={styles.largePoster}
         />
@@ -194,8 +198,10 @@ export default function DetailPage() {
           <div className={styles.content}>
             <div className={styles.contentimg}>
               <img
-                src={`https://image.tmdb.org/t/p/w500/${details.poster_path}`}
-                alt={details.title || details.name}
+                src={details.poster_path
+                  ? `https://image.tmdb.org/t/p/w500/${details.poster_path}`
+                  : "/PosterAlt.png"}
+                alt={details.title || details.name || "Default Poster"}
                 className={styles.poster}
               />
             </div>
@@ -253,7 +259,7 @@ export default function DetailPage() {
                         src={
                           member.profile_path
                             ? `https://image.tmdb.org/t/p/w200/${member.profile_path}`
-                            : "/no-image.png"
+                            : "/altProfileImage.png"
                         }
                         alt={member.name}
                         className={styles.castImage}

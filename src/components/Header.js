@@ -44,7 +44,7 @@ export default function Header() {
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
               <img
-                src={getUserImage()}
+                src={getUserImage() || "/altProfilePic.jpg"}
                 alt="User Avatar"
                 className={styles.userImage}
               />
