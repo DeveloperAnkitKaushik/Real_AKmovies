@@ -1,45 +1,64 @@
-import apiConfig from "./apiConfig";
+import axiosClient from './axiosClient';
 
 export const category = {
-    movie: "movie",
-    tv: "tv",
+    movie: 'movie',
+    tv: 'tv',
 };
 
 export const movieType = {
-    upcoming: "upcoming",
-    popular: "popular",
-    top_rated: "top_rated",
+    upcoming: 'upcoming',
+    popular: 'popular',
+    top_rated: 'top_rated',
 };
 
 export const tvType = {
-    popular: "popular",
-    top_rated: "top_rated",
-    on_the_air: "on_the_air",
-};
-
-const fetchFromAPI = async (endpoint, params = {}) => {
-    const url = new URL(`${apiConfig.baseUrl}${endpoint}`);
-    params.api_key = apiConfig.apiKey;
-    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-
-    try {
-        const response = await fetch(url.toString());
-        if (!response.ok) throw new Error("Failed to fetch data");
-        return await response.json();
-    } catch (error) {
-        console.error("API Fetch Error:", error);
-        throw error;
-    }
+    popular: 'popular',
+    top_rated: 'top_rated',
+    on_the_air: 'on_the_air',
 };
 
 const tmdbApi = {
-    getMoviesList: (type, params = {}) => fetchFromAPI(`movie/${movieType[type]}`, params),
-    getTvList: (type, params = {}) => fetchFromAPI(`tv/${tvType[type]}`, params),
-    getVideos: (cate, id) => fetchFromAPI(`${category[cate]}/${id}/videos`),
-    search: (cate, params = {}) => fetchFromAPI(`search/${category[cate]}`, params),
-    detail: (cate, id, params = {}) => fetchFromAPI(`${category[cate]}/${id}`, params),
-    credits: (cate, id) => fetchFromAPI(`${category[cate]}/${id}/credits`),
-    similar: (cate, id) => fetchFromAPI(`${category[cate]}/${id}/similar`),
+    // Fetch movie list by type (popular, upcoming, top-rated)
+    getMoviesList: (type, params = {}) => {
+        const url = `movie/${movieType[type]}`;
+        return axiosClient.get(url, { params });
+    },
+
+    // Fetch TV list by type (popular, top-rated, on the air)
+    getTvList: (type, params = {}) => {
+        const url = `tv/${tvType[type]}`;
+        return axiosClient.get(url, { params });
+    },
+
+    // Fetch videos for a movie or TV show
+    getVideos: (cate, id) => {
+        const url = `${category[cate]}/${id}/videos`;
+        return axiosClient.get(url);
+    },
+
+    // Search for movies or TV shows
+    search: (cate, params = {}) => {
+        const url = `search/${category[cate]}`;
+        return axiosClient.get(url, { params });
+    },
+
+    // Fetch details for a movie or TV show
+    detail: (cate, id, params = {}) => {
+        const url = `${category[cate]}/${id}`;
+        return axiosClient.get(url, { params });
+    },
+
+    // Fetch credits (cast and crew) for a movie or TV show
+    credits: (cate, id) => {
+        const url = `${category[cate]}/${id}/credits`;
+        return axiosClient.get(url);
+    },
+
+    // Fetch similar movies or TV shows
+    similar: (cate, id) => {
+        const url = `${category[cate]}/${id}/similar`;
+        return axiosClient.get(url);
+    },
 };
 
 export default tmdbApi;
