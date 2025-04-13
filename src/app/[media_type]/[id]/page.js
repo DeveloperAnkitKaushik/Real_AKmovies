@@ -14,7 +14,8 @@ import ShowVideoButton from "@/components/ShowVideoButton";
 import toast from 'react-hot-toast';
 import { FaPlayCircle } from "react-icons/fa";
 import { FaExchangeAlt } from "react-icons/fa";
-
+import { FaBackward } from "react-icons/fa";
+import { FaForward } from "react-icons/fa";
 
 export default function DetailPage() {
   const { media_type, id } = useParams();
@@ -118,27 +119,28 @@ export default function DetailPage() {
     fetchEpisodes(details.id, seasonNumber);
   };
 
-  const addToContinueWatching = async () => {
+  const addToContinueWatching = async (season, episode) => {
     if (!user || !details) {
-      toast.error('Please login First!');
+      toast.error("Please login First!");
       return;
     }
-
+  
     const userId = user.uid;
-    const historyRef = doc(db, "users", userId, "history", id);
-
+    const historyRef = doc(db, "users", userId, "history", id); // ✅ your original `id` preserved
+  
     await setDoc(historyRef, {
       id: details.id,
       title: details.title || details.name,
       mediaType: media_type,
       posterPath: details.poster_path,
       description: details.overview,
-      season: selectedSeason,
-      episode: selectedEpisode,
+      season,
+      episode,
       lastWatched: new Date().toISOString(),
     });
-    setShowIframePlayer(true);
   };
+  
+
 
   const addToFavorites = async () => {
     if (!user || !details) {
@@ -173,6 +175,62 @@ export default function DetailPage() {
     toast.success(`Removed from your favorites.`)
   };
 
+  const hasNext = () => {
+    const currentIndex = episodes.findIndex(e => e.episode_number === selectedEpisode);
+    return currentIndex < episodes.length - 1 || selectedSeason < seasons.length;
+  };
+
+  const hasPrev = () => {
+    const currentIndex = episodes.findIndex(e => e.episode_number === selectedEpisode);
+    return currentIndex > 0 || selectedSeason > 1;
+  };
+
+  const goToNext = async () => {
+    const currentIndex = episodes.findIndex(e => e.episode_number === selectedEpisode);
+    if (currentIndex < episodes.length - 1) {
+      const nextEpisode = episodes[currentIndex + 1].episode_number;
+      setSelectedEpisode(nextEpisode);
+      await addToContinueWatching(selectedSeason, nextEpisode); // ✅ pass explicitly
+    } else if (selectedSeason < seasons.length) {
+      const nextSeasonNumber = seasons[selectedSeason]?.season_number || selectedSeason + 1;
+      setSelectedSeason(nextSeasonNumber);
+      const res = await fetch(
+        `https://api.themoviedb.org/3/tv/${details.id}/season/${nextSeasonNumber}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+      );
+      const data = await res.json();
+      const firstEpisode = data.episodes[0]?.episode_number || 1;
+      setEpisodes(data.episodes);
+      setSelectedEpisode(firstEpisode);
+      await addToContinueWatching(nextSeasonNumber, firstEpisode);
+    }
+  };
+  
+
+  const goToPrev = async () => {
+    const currentIndex = episodes.findIndex(e => e.episode_number === selectedEpisode);
+    if (currentIndex > 0) {
+      const prevEpisode = episodes[currentIndex - 1].episode_number;
+      setSelectedEpisode(prevEpisode);
+      await addToContinueWatching(selectedSeason, prevEpisode);
+    } else if (selectedSeason > 1) {
+      const prevSeasonNumber = seasons[selectedSeason - 2]?.season_number || selectedSeason - 1;
+      setSelectedSeason(prevSeasonNumber);
+      const res = await fetch(
+        `https://api.themoviedb.org/3/tv/${details.id}/season/${prevSeasonNumber}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+      );
+      const data = await res.json();
+      const lastEpisode = data.episodes[data.episodes.length - 1]?.episode_number || 1;
+      setEpisodes(data.episodes);
+      setSelectedEpisode(lastEpisode);
+      await addToContinueWatching(prevSeasonNumber, lastEpisode);
+    }
+  };
+  
+
+  const showFrame = () => {
+    addToContinueWatching(selectedEpisode,selectedSeason);
+    setShowIframePlayer(!showIframePlayer);
+  }
 
   if (loading) return <Loader />;
 
@@ -249,6 +307,23 @@ export default function DetailPage() {
                     Add to Favorites
                   </button>
                 )}
+                <button
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({
+                        title: details.title || details.name,
+                        text: "Check this out on AKMovies!",
+                        url: window.location.href,
+                      }).catch((error) => console.error("Share failed:", error));
+                    } else {
+                      navigator.clipboard.writeText(window.location.href);
+                      toast.success("Link copied to clipboard!");
+                    }
+                  }}
+                  className={styles.favoriteButton}
+                >
+                  Share
+                </button>
               </div>
               <div className={styles.castContainer}>
                 <h2>Top Cast</h2>
@@ -313,16 +388,31 @@ export default function DetailPage() {
             </div>
           )}
 
+
           {/* Vidsrc Player */}
           <div className={styles.videoContainer}>
             <h1>Use AdBlockers</h1>
-            <div className={styles.changeIcon} onClick={() => {
-              if (!user) {
-                toast.error('Please Login First!');
-                return;
-              }
-              setSecondPlayer(!secondPlayer);
-            }}>Change Server <FaExchangeAlt /></div>
+            <div className={styles.seriesoptions}>
+              <div
+                onClick={hasPrev() && media_type === 'tv' ? goToPrev : null}
+                className={`${styles.backfrontbtn} ${!hasPrev() || media_type !== 'tv' ? styles.removebtns : ''}`}
+              >
+                <FaBackward /> Previous
+              </div>
+              <div className={styles.changeIcon} onClick={() => {
+                if (!user) {
+                  toast.error('Please Login First!');
+                  return;
+                }
+                setSecondPlayer(!secondPlayer);
+              }}>Change Server <FaExchangeAlt /></div>
+              <div
+                onClick={hasNext() && media_type === 'tv' ? goToNext : null}
+                className={`${styles.backfrontbtn} ${!hasNext() || media_type !== 'tv' ? styles.removebtns : ''}`}
+              >
+                Next <FaForward />
+              </div>
+            </div>
             {!showIframePlayer ? (
               <div
                 className={styles.outerPlayer}
@@ -332,7 +422,7 @@ export default function DetailPage() {
               >
                 <div className={styles.playeroverlay}>
                 </div>
-                <FaPlayCircle className={styles.playButton} onClick={addToContinueWatching} />
+                <FaPlayCircle className={styles.playButton} onClick={showFrame} />
               </div>
             ) : (
               <iframe
@@ -345,7 +435,6 @@ export default function DetailPage() {
                 width="100%"
                 height="500px"
                 allowFullScreen
-                // sandbox={secondPlayer ? undefined : "allow-scripts allow-same-origin"}
                 className={styles.videoPlayer}
               />
             )}
