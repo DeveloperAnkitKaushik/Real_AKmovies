@@ -1,10 +1,10 @@
 export async function generateMetadata({ params }) {
   if (!params) return {};
-  const { media_type, id } = await params;
+  const { media_type, id } = params; // ❌ No need for await params
 
-  // Fetch Movie/TV Show Data
+  // Fetch Movie/TV Show Data through proxy
   const res = await fetch(
-    `https://api.themoviedb.org/3/${media_type}/${id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+    `${process.env.NEXT_PUBLIC_SITE_URL}/api/tmdb/${media_type}/${id}`
   );
   const data = await res.json();
 
@@ -17,7 +17,7 @@ export async function generateMetadata({ params }) {
     title,
     description,
     alternates: {
-      canonical: url, // ✅ Canonical URL added for SEO
+      canonical: url,
     },
     openGraph: {
       title,

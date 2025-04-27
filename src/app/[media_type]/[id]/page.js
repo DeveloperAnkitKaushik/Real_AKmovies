@@ -39,9 +39,7 @@ export default function DetailPage() {
 
       try {
         // Fetch TV or movie details
-        const res = await fetch(
-          `https://api.themoviedb.org/3/${media_type}/${id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&append_to_response=videos,credits`
-        );
+        const res = await fetch(`/api/tmdb/${media_type}/${id}?append_to_response=videos,credits`);
         const data = await res.json();
         setDetails(data);
 
@@ -98,16 +96,10 @@ export default function DetailPage() {
   }, [media_type, id, user]);
   const fetchEpisodes = async (tvId, seasonNumber, episodeNumber = 1) => {
     try {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-      );
+      const res = await fetch(`/api/tmdb/tv/${tvId}/season/${seasonNumber}`);
       const data = await res.json();
       setEpisodes(data.episodes || []);
-
-      // Check if episode is valid
-      const validEpisode = data.episodes.some(
-        (ep) => ep.episode_number === episodeNumber
-      );
+      const validEpisode = data.episodes.some((ep) => ep.episode_number === episodeNumber);
       setSelectedEpisode(validEpisode ? episodeNumber : 1);
     } catch (error) {
       console.error("Failed to fetch episodes:", error);
@@ -186,17 +178,15 @@ export default function DetailPage() {
   };
 
   const goToNext = async () => {
-    const currentIndex = episodes.findIndex(e => e.episode_number === selectedEpisode);
+    const currentIndex = episodes.findIndex((e) => e.episode_number === selectedEpisode);
     if (currentIndex < episodes.length - 1) {
       const nextEpisode = episodes[currentIndex + 1].episode_number;
       setSelectedEpisode(nextEpisode);
-      await addToContinueWatching(selectedSeason, nextEpisode); // ✅ pass explicitly
+      await addToContinueWatching(selectedSeason, nextEpisode);
     } else if (selectedSeason < seasons.length) {
       const nextSeasonNumber = seasons[selectedSeason]?.season_number || selectedSeason + 1;
       setSelectedSeason(nextSeasonNumber);
-      const res = await fetch(
-        `https://api.themoviedb.org/3/tv/${details.id}/season/${nextSeasonNumber}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-      );
+      const res = await fetch(`/api/tmdb/tv/${details.id}/season/${nextSeasonNumber}`);
       const data = await res.json();
       const firstEpisode = data.episodes[0]?.episode_number || 1;
       setEpisodes(data.episodes);
@@ -204,10 +194,9 @@ export default function DetailPage() {
       await addToContinueWatching(nextSeasonNumber, firstEpisode);
     }
   };
-  
 
   const goToPrev = async () => {
-    const currentIndex = episodes.findIndex(e => e.episode_number === selectedEpisode);
+    const currentIndex = episodes.findIndex((e) => e.episode_number === selectedEpisode);
     if (currentIndex > 0) {
       const prevEpisode = episodes[currentIndex - 1].episode_number;
       setSelectedEpisode(prevEpisode);
@@ -215,9 +204,7 @@ export default function DetailPage() {
     } else if (selectedSeason > 1) {
       const prevSeasonNumber = seasons[selectedSeason - 2]?.season_number || selectedSeason - 1;
       setSelectedSeason(prevSeasonNumber);
-      const res = await fetch(
-        `https://api.themoviedb.org/3/tv/${details.id}/season/${prevSeasonNumber}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
-      );
+      const res = await fetch(`/api/tmdb/tv/${details.id}/season/${prevSeasonNumber}`);
       const data = await res.json();
       const lastEpisode = data.episodes[data.episodes.length - 1]?.episode_number || 1;
       setEpisodes(data.episodes);
@@ -228,9 +215,9 @@ export default function DetailPage() {
   
 
   const showFrame = () => {
-    addToContinueWatching(selectedEpisode,selectedSeason);
+    addToContinueWatching(selectedSeason, selectedEpisode); // ✅ Corrected
     setShowIframePlayer(!showIframePlayer);
-  }
+  };
 
   if (loading) return <Loader />;
 
