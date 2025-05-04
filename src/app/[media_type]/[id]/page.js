@@ -32,6 +32,7 @@ export default function DetailPage() {
   const [cast, setCast] = useState([]);
   const [showIframePlayer, setShowIframePlayer] = useState(false);
   const [secondPlayer, setSecondPlayer] = useState(false);
+  const [playerIndex, setPlayerIndex] = useState(1);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -94,6 +95,25 @@ export default function DetailPage() {
 
     fetchDetails();
   }, [media_type, id, user]);
+
+  const cyclePlayer = () => {
+    if (!user) {
+      toast.error('Please Login First!');
+      return;
+    }
+    setPlayerIndex((prev) => (prev % 3) + 1);
+  };
+
+  let playerBaseUrl;
+  if (playerIndex === 1) {
+    playerBaseUrl = process.env.NEXT_PUBLIC_FIRST_VIDIOPLAYER_APP;
+  } else if (playerIndex === 2) {
+    playerBaseUrl = process.env.NEXT_PUBLIC_SECOND_VIDIOPLAYER_APP;
+  } else {
+    playerBaseUrl = process.env.NEXT_PUBLIC_THIRD_VIDIOPLAYER_APP;
+  }
+
+
   const fetchEpisodes = async (tvId, seasonNumber, episodeNumber = 1) => {
     try {
       const res = await fetch(`/api/tmdb/tv/${tvId}/season/${seasonNumber}`);
@@ -116,10 +136,10 @@ export default function DetailPage() {
       toast.error("Please login First!");
       return;
     }
-  
+
     const userId = user.uid;
     const historyRef = doc(db, "users", userId, "history", id); // ✅ your original `id` preserved
-  
+
     await setDoc(historyRef, {
       id: details.id,
       title: details.title || details.name,
@@ -131,7 +151,7 @@ export default function DetailPage() {
       lastWatched: new Date().toISOString(),
     });
   };
-  
+
 
 
   const addToFavorites = async () => {
@@ -212,7 +232,7 @@ export default function DetailPage() {
       await addToContinueWatching(prevSeasonNumber, lastEpisode);
     }
   };
-  
+
 
   const showFrame = () => {
     addToContinueWatching(selectedSeason, selectedEpisode); // ✅ Corrected
@@ -386,13 +406,9 @@ export default function DetailPage() {
               >
                 <FaBackward /> Previous
               </div>
-              <div className={styles.changeIcon} onClick={() => {
-                if (!user) {
-                  toast.error('Please Login First!');
-                  return;
-                }
-                setSecondPlayer(!secondPlayer);
-              }}>Change Server <FaExchangeAlt /></div>
+              <div className={styles.changeIcon} onClick={cyclePlayer}>
+                Change Server <FaExchangeAlt />
+              </div>
               <div
                 onClick={hasNext() && media_type === 'tv' ? goToNext : null}
                 className={`${styles.backfrontbtn} ${!hasNext() || media_type !== 'tv' ? styles.removebtns : ''}`}
@@ -415,8 +431,8 @@ export default function DetailPage() {
               <iframe
                 src={
                   media_type === "tv"
-                    ? `${secondPlayer ? process.env.NEXT_PUBLIC_SECOND_VIDIOPLAYER_APP : process.env.NEXT_PUBLIC_FIRST_VIDIOPLAYER_APP}/tv/${id}/${selectedSeason}/${selectedEpisode}?autoPlay=false`
-                    : `${secondPlayer ? process.env.NEXT_PUBLIC_SECOND_VIDIOPLAYER_APP : process.env.NEXT_PUBLIC_FIRST_VIDIOPLAYER_APP}/movie/${id}`
+                    ? `${playerBaseUrl}/tv/${id}/${selectedSeason}/${selectedEpisode}?autoPlay=false`
+                    : `${playerBaseUrl}/movie/${id}`
                 }
                 frameBorder="0"
                 width="100%"

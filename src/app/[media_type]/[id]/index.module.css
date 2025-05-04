@@ -296,8 +296,10 @@
   font-size: 1rem;
   color: rgb(192, 192, 192);
   text-align: center;
-  
+  display: flex;
+  align-items: center;
   cursor: pointer;
+  gap: 0.4rem;
 }
 
 .videoPlayer{
