@@ -53,13 +53,11 @@ export default function Header() {
               </span>
             </div>
           ) : (
-            // Display Login Button when the user is not logged in
             <button className={styles.loginButton} onClick={login}>
               Login
             </button>
           )}
 
-          {/* Dropdown Menu */}
           {dropdownOpen && user && (
             <div className={styles.dropdown}>
               <Link
@@ -76,6 +74,17 @@ export default function Header() {
               >
                 Favorites
               </Link>
+
+              {user.email === "ankitkaushik6269@gmail.com" && (
+                <Link
+                  href="/admin"
+                  className={styles.dropdownItem}
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Admin Panel
+                </Link>
+              )}
+
               <button
                 onClick={() => {
                   logout();

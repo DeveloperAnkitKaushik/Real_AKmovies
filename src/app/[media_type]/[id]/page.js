@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
+import { getDocs, collection } from "firebase/firestore";
 import { db } from "../../../utils/firebase";
 import { useAuth } from "../../../context/AuthContext";
 import styles from "./index.module.css";
@@ -33,6 +34,16 @@ export default function DetailPage() {
   const [showIframePlayer, setShowIframePlayer] = useState(false);
   const [secondPlayer, setSecondPlayer] = useState(false);
   const [playerIndex, setPlayerIndex] = useState(1);
+  const [servers, setServers] = useState([]);
+
+  useEffect(() => {
+    const fetchServers = async () => {
+      const querySnapshot = await getDocs(collection(db, "servers"));
+      const data = querySnapshot.docs.map(doc => doc.data());
+      setServers(data.sort((a, b) => a.index - b.index));
+    };
+    fetchServers();
+  }, []);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -104,15 +115,7 @@ export default function DetailPage() {
     setPlayerIndex((prev) => (prev % 3) + 1);
   };
 
-  let playerBaseUrl;
-  if (playerIndex === 1) {
-    playerBaseUrl = process.env.NEXT_PUBLIC_FIRST_VIDIOPLAYER_APP;
-  } else if (playerIndex === 2) {
-    playerBaseUrl = process.env.NEXT_PUBLIC_SECOND_VIDIOPLAYER_APP;
-  } else {
-    playerBaseUrl = process.env.NEXT_PUBLIC_THIRD_VIDIOPLAYER_APP;
-  }
-
+  const playerBaseUrl = servers[playerIndex - 1]?.url || "";
 
   const fetchEpisodes = async (tvId, seasonNumber, episodeNumber = 1) => {
     try {
@@ -235,6 +238,10 @@ export default function DetailPage() {
 
 
   const showFrame = () => {
+    if (!user) {
+      toast.error('Please Login First!');
+      return;
+    }
     addToContinueWatching(selectedSeason, selectedEpisode); // ✅ Corrected
     setShowIframePlayer(!showIframePlayer);
   };
@@ -431,7 +438,7 @@ export default function DetailPage() {
               <iframe
                 src={
                   media_type === "tv"
-                    ? `${playerBaseUrl}/tv/${id}/${selectedSeason}/${selectedEpisode}?autoPlay=false`
+                    ? `${playerBaseUrl}/tv/${id}/${selectedSeason}/${selectedEpisode}`
                     : `${playerBaseUrl}/movie/${id}`
                 }
                 frameBorder="0"
