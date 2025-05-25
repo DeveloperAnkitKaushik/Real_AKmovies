@@ -4,8 +4,11 @@ import useEmblaCarousel from "embla-carousel-react";
 import { motion } from "framer-motion";
 import tmdbApi, { movieType } from "../utils/tmdbApi";
 import apiConfig from "../utils/apiConfig";
-import styles from "./slider.module.css" // Add your styles here
+import styles from "./slider.module.css"
 import Loader from "@/skeletons/SimpleLoader";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "@/utils/firebase";
+
 
 const EmblaCarousel = () => {
     const [popular, setPopular] = useState([]); // Store popular TV/movies
@@ -17,7 +20,12 @@ const EmblaCarousel = () => {
         const fetchPopular = async () => {
             try {
                 const response = await tmdbApi.getMoviesList(movieType.popular, { page: 1 });
-                setPopular(response.results.slice(0, 5)); // Take top 5 popular TV/movies
+
+                // Get limit from Firestore
+                const limitSnap = await getDoc(doc(db, "settings", "slider"));
+                const limit = limitSnap.exists() ? limitSnap.data().limit : 5;
+
+                setPopular(response.results.slice(0, limit));
             } catch (error) {
                 console.error("Failed to fetch popular movies:", error);
             }

@@ -7,6 +7,12 @@
     text-align: center;
 }
 
+.innercontaier{
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
 .bg {
     background-position: top;
     background-repeat: no-repeat;
@@ -33,7 +39,7 @@
 
 .inputdiv {
     display: flex;
-    margin-top: 2rem;
+    margin-top: 1rem;
     margin-bottom: 1.5rem;
     justify-content: space-between;
     width: 100%;

@@ -23,6 +23,18 @@ body {
     /* scrollbar-color: transparent transparent; */
 }
 
+/* Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
 .text-gradient {
     background: linear-gradient(79deg, #2b0aff, #ff5b8a 49%, #ff5b8a 55%, #fba64b 77%, #f99b52);
     -webkit-background-clip: text;

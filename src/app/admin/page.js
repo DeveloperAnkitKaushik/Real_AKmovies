@@ -1,22 +1,31 @@
 "use client";
 import { useEffect, useState } from "react";
-import { collection, getDocs, updateDoc, doc, deleteDoc, addDoc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, deleteDoc, addDoc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/utils/firebase";
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useAuth } from "@/context/AuthContext";
 import toast from "react-hot-toast";
 import styles from "./index.module.css";
 import { notFound } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function AdminPage() {
+    const [sliderLimit, setSliderLimit] = useState(5);
     const { user } = useAuth();
     const [servers, setServers] = useState([]);
     const [newUrl, setNewUrl] = useState("");
+    const router = useRouter();
 
     const isAdmin = user?.email === "ankitkaushik6269@gmail.com";
 
     useEffect(() => {
-        if (isAdmin) fetchServers();
+        if (user && !isAdmin) {
+            router.replace("/not-found"); // or a custom error route
+        }
+        if (isAdmin) {
+            fetchServers();
+            fetchSliderLimit(); // 🔁 fetch slider limit
+        }
     }, [user]);
 
     const fetchServers = async () => {
@@ -27,6 +36,21 @@ export default function AdminPage() {
         }));
         setServers(docs.sort((a, b) => a.index - b.index));
     };
+
+    const fetchSliderLimit = async () => {
+        const ref = doc(db, "settings", "slider");
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+            setSliderLimit(snap.data().limit);
+        }
+    };
+
+    const updateSliderLimit = async () => {
+        const ref = doc(db, "settings", "slider");
+        await setDoc(ref, { limit: Number(sliderLimit) });
+        toast.success("Slider limit updated!");
+    };
+
 
     const onDragEnd = async (result) => {
         if (!result.destination) return;
@@ -58,10 +82,6 @@ export default function AdminPage() {
         fetchServers();
     };
 
-    if (!isAdmin){
-        notFound();
-    }
-
     return (
         <div className={styles.container}>
             <div className={styles.bg} style={{ backgroundImage: `url(/bg.jpg)` }} >
@@ -69,48 +89,65 @@ export default function AdminPage() {
                 <div className={styles.bgoverlay}></div>
             </div>
             <div className="maincontainer">
-                <h2>Manage Video Player Servers</h2>
-                <div className={styles.inputdiv}>
-                    <input
-                        type="text"
-                        placeholder="Enter server URL"
-                        value={newUrl}
-                        onChange={(e) => setNewUrl(e.target.value)}
-                        className={styles.input}
-                    />
-                    <button onClick={handleAdd}>Add Server</button>
+                <div className={styles.innercontaier}>
+                    <div className={styles.servercontainer}>
+                        <h2>Manage Video Player Servers</h2>
+                        <div className={styles.inputdiv}>
+                            <input
+                                type="text"
+                                placeholder="Enter server URL"
+                                value={newUrl}
+                                onChange={(e) => setNewUrl(e.target.value)}
+                                className={styles.input}
+                            />
+                            <button onClick={handleAdd}>Add Server</button>
+                        </div>
+                        <DragDropContext onDragEnd={onDragEnd}>
+                            <Droppable droppableId="servers">
+                                {(provided) => (
+                                    <ul {...provided.droppableProps} ref={provided.innerRef} className={styles.items}>
+                                        {servers.map((server, index) => (
+                                            <Draggable key={server.id} draggableId={server.id} index={index}>
+                                                {(provided) => (
+                                                    <li
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                        className={styles.item}
+                                                    >
+                                                        <span>
+                                                            <strong>Server {index + 1}:</strong> {server.url}
+                                                            <span style={{ color: "#999", marginLeft: "10px", fontSize: "12px" }}>
+                                                                (drag to reorder)
+                                                            </span>
+                                                        </span>
+                                                        <button onClick={() => handleDelete(server.id)} className={styles.deletebtn}>
+                                                            Delete
+                                                        </button>
+                                                    </li>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </ul>
+                                )}
+                            </Droppable>
+                        </DragDropContext>
+                    </div>
+                    <div className={styles.limitcontainer}>
+                        <h2>Set Popular Slider Limit</h2>
+                        <div className={styles.inputdiv}>
+                            <input
+                                type="number"
+                                min={1}
+                                value={sliderLimit}
+                                onChange={(e) => setSliderLimit(e.target.value)}
+                                className={styles.input}
+                            />
+                            <button onClick={updateSliderLimit}>Update Limit</button>
+                        </div>
+                    </div>
                 </div>
-                <DragDropContext onDragEnd={onDragEnd}>
-                    <Droppable droppableId="servers">
-                        {(provided) => (
-                            <ul {...provided.droppableProps} ref={provided.innerRef} className={styles.items}>
-                                {servers.map((server, index) => (
-                                    <Draggable key={server.id} draggableId={server.id} index={index}>
-                                        {(provided) => (
-                                            <li
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                className={styles.item}
-                                            >
-                                                <span>
-                                                    <strong>Server {index + 1}:</strong> {server.url}
-                                                    <span style={{ color: "#999", marginLeft: "10px", fontSize: "12px" }}>
-                                                        (drag to reorder)
-                                                    </span>
-                                                </span>
-                                                <button onClick={() => handleDelete(server.id)} className={styles.deletebtn}>
-                                                    Delete
-                                                </button>
-                                            </li>
-                                        )}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </ul>
-                        )}
-                    </Droppable>
-                </DragDropContext>
             </div>
         </div>
     );
