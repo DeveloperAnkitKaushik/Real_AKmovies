@@ -24,7 +24,6 @@ export default function AdminPage() {
         }
         if (isAdmin) {
             fetchServers();
-            fetchSliderLimit(); // 🔁 fetch slider limit
         }
     }, [user]);
 
@@ -35,14 +34,6 @@ export default function AdminPage() {
             ...doc.data()
         }));
         setServers(docs.sort((a, b) => a.index - b.index));
-    };
-
-    const fetchSliderLimit = async () => {
-        const ref = doc(db, "settings", "slider");
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-            setSliderLimit(snap.data().limit);
-        }
     };
 
     const updateSliderLimit = async () => {
@@ -133,19 +124,6 @@ export default function AdminPage() {
                                 )}
                             </Droppable>
                         </DragDropContext>
-                    </div>
-                    <div className={styles.limitcontainer}>
-                        <h2>Set Popular Slider Limit</h2>
-                        <div className={styles.inputdiv}>
-                            <input
-                                type="number"
-                                min={1}
-                                value={sliderLimit}
-                                onChange={(e) => setSliderLimit(e.target.value)}
-                                className={styles.input}
-                            />
-                            <button onClick={updateSliderLimit}>Update Limit</button>
-                        </div>
                     </div>
                 </div>
             </div>
